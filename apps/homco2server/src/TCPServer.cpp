@@ -19,7 +19,7 @@ TCPServer::~TCPServer()
 {
 }
 
-void TCPServer::addToQueue(std::unique_ptr<common::IPacket> packet)
+/*void TCPServer::addToQueue(std::unique_ptr<common::IPacket> packet)
 {
   _queue.push(std::move(packet));
 }
@@ -34,6 +34,16 @@ void TCPServer::flush()
     }
     _queue.pop();
   }
+}*/
+
+std::vector<std::unique_ptr<common::IPacket>> TCPServer::takePackets()
+{
+  std::vector<std::unique_ptr<common::IPacket>> temp;
+  if (_connection) {
+    auto packets = _connection->takeQueue();
+    std::swap(packets, temp);
+  }
+  return std::move(temp);
 }
 
 void TCPServer::startAccept()
@@ -45,8 +55,8 @@ void TCPServer::startAccept()
 void TCPServer::handleAccept(std::shared_ptr<common::TCPConnection> newConnection, const asio::error_code& error)
 {
   if (!error) {
-    _connections.push_back(newConnection);
-    newConnection->start();
+    _connection = newConnection;
+    _connection->start();
     startAccept();
   }
 }

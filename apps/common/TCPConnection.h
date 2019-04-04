@@ -5,6 +5,7 @@
 #include <asio.hpp>
 
 #include <memory>
+#include <vector>
 
 namespace homco2 {
 namespace common {
@@ -21,6 +22,11 @@ public:
 
   void start();
   void writeAsync(std::shared_ptr<IPacket> packet);
+  std::vector<std::unique_ptr<IPacket>> takeQueue() {
+    std::vector<std::unique_ptr<IPacket>> temp;
+    std::swap(temp, _packetQueue);
+    return std::move(temp);
+  }
 
 private:
   TCPConnection(asio::io_service& ioService)
@@ -34,6 +40,7 @@ private:
 
   asio::streambuf _readBuf;
   asio::ip::tcp::socket _socket;
+  std::vector<std::unique_ptr<IPacket>> _packetQueue;
 };
 
 }

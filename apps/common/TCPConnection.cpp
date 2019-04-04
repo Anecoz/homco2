@@ -89,17 +89,18 @@ void TCPConnection::handleReadHeader(const asio::error_code& error)
     char* packetBuffer = new char [packetSize];
     packetStream.read(packetBuffer, packetSize);
     
-    // TODO: Create packet from raw data!
+
     std::unique_ptr<std::uint8_t[]> rawData = std::make_unique<std::uint8_t[]>(packetSize);
     memcpy(rawData.get(), packetBuffer, packetSize);
     auto packet = PacketFactory::createFromRawData(packetHeader, std::move(rawData), packetSize);
+    _packetQueue.emplace_back(std::move(packet));
 
-    if (auto helloPacket = dynamic_cast<HelloPacket*>(packet.get())) {
+    /*if (auto helloPacket = dynamic_cast<HelloPacket*>(packet.get())) {
       std::cout << "Received a hello packet, message is: " << helloPacket->message() << std::endl;
     }
     else if (auto dataPacket = dynamic_cast<DataPacket*>(packet.get())) {
       std::cout << "Received a data packet, data is: " << std::to_string(dataPacket->data()) << std::endl;
-    }
+    }*/
 
     delete[] packetBuffer;
   }
