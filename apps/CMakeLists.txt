@@ -1,0 +1,2 @@
+add_subdirectory(homco2server)
+add_subdirectory(homco2app)
