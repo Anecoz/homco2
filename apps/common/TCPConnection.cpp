@@ -10,6 +10,11 @@
 namespace homco2 {
 namespace common {
 
+TCPConnection::~TCPConnection()
+{
+  std::cout << "TCPConnection destroyed, (I was " << _readableAddress << " at some point.)" << std::endl;
+}
+
 void TCPConnection::start()
 {
   readAsync();
@@ -41,6 +46,11 @@ void TCPConnection::handleWrite(const char* rawData, std::size_t rawDataSize, co
   delete[] rawData;
 }
 
+void TCPConnection::updateAddress()
+{
+  _readableAddress = _socket.remote_endpoint().address().to_string();
+}
+
 void TCPConnection::readAsync()
 {
   asio::async_read(
@@ -57,9 +67,8 @@ void TCPConnection::handleReadHeader(const asio::error_code& error)
     return;
   }
   else if (error == asio::error::connection_reset) {
-    std::cout << "A connection was reset. Not re-reading." << std::endl;
+    _dead = true;
     return;
-    // TODO: Flag our connection with dead so it can be removed by server?
   }
 
   if (!error) {
