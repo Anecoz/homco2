@@ -17,5 +17,10 @@ if (NOT APPLE)
   add_definitions(-DBOOST_ASIO_DISABLE_IOCP=1)
 endif()
 
+# For GPIO implementation specifics.
+if (NOT LINUX)
+  add_definitions(-DTEST=1)
+endif()
+
 add_subdirectory(contrib)
 add_subdirectory(apps)
