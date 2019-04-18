@@ -18,6 +18,8 @@ public:
 
   Channel() = delete;
 
+  void setMaster(bool state);
+
   void update();
 
 private:

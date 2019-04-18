@@ -23,6 +23,13 @@ void Channel::setState(bool state)
   _state = state;
 }
 
+void Channel::setMaster(bool state) 
+{
+  _master = state;
+  // TODO: THIS IS WRONG AND WON'T WORK. THINK IT THROUGH.
+  setState(_master);
+}
+
 void Channel::update()
 {
   // Check the time and figure out if we need to turn ourselves on or off.

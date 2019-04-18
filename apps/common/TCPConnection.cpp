@@ -1,7 +1,5 @@
 #include "TCPConnection.h"
 
-#include "HelloPacket.h"
-#include "DataPacket.h"
 #include "PacketHeader.h"
 #include "PacketFactory.h"
 

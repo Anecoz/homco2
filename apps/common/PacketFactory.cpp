@@ -2,6 +2,7 @@
 
 #include "HelloPacket.h"
 #include "DataPacket.h"
+#include "MasterStateChangePacket.h"
 
 namespace homco2 {
 namespace common {
@@ -13,6 +14,8 @@ std::unique_ptr<IPacket> PacketFactory::createFromRawData(const PacketHeader& he
     return std::unique_ptr<IPacket>(new HelloPacket(reinterpret_cast<char*>(rawData.get()), rawSize));
   case PacketType::DataPacket:
     return std::unique_ptr<IPacket>(new DataPacket(reinterpret_cast<char*>(rawData.get()), rawSize));
+  case PacketType::MasterStateChangePacket:
+    return std::unique_ptr<IPacket>(new MasterStateChangePacket(reinterpret_cast<char*>(rawData.get()), rawSize));
   }
 
   return nullptr;

@@ -2,6 +2,7 @@
 
 #include "HelloPacket.h"
 #include "DataPacket.h"
+#include "MasterStateChangePacket.h"
 
 #include <iostream>
 
@@ -41,6 +42,14 @@ NetworkManager::NetworkManager()
     {
       std::cout << "Sending a data packet instead, data is 42" << std::endl;
       auto packet = std::make_shared<common::DataPacket>(42);
+      auto header = packet->createHeader();
+      std::cout << "Packet now going to write, header size is: " << std::to_string(header.headerByteSize()) << ", packet size is: " << std::to_string(header.getSizeOfPacket()) << std::endl;
+      _connection->writeAsync(packet);
+    }
+
+    {
+      std::cout << "Sending a master state change packet, channel 2 and state is on" << std::endl;
+      auto packet = std::make_shared<common::MasterStateChangePacket>(2, true);
       auto header = packet->createHeader();
       std::cout << "Packet now going to write, header size is: " << std::to_string(header.headerByteSize()) << ", packet size is: " << std::to_string(header.getSizeOfPacket()) << std::endl;
       _connection->writeAsync(packet);

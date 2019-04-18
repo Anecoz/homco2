@@ -2,6 +2,8 @@
 #include "Gpio.h"
 #include "Channel.h"
 
+#include "MasterStateChangePacket.h"
+
 #include <iostream>
 #include <chrono>
 #include <vector>
@@ -26,7 +28,13 @@ int main()
     auto packets = server.takePackets();
     if (!packets.empty()) {
       std::cout << "Server gave us " << std::to_string(packets.size()) << " new packets." << std::endl;
-      // TODO: Go through packets. Update channels based on packets.
+      for (auto& packet: packets) {
+        auto header = packet->createHeader();
+        if (header.getTypeOfPacket() == homco2::common::PacketType::MasterStateChangePacket) {
+          auto masterPacket = dynamic_cast<homco2::common::MasterStateChangePacket*>(packet.get());
+          channels[masterPacket->channel()].setMaster(masterPacket->masterState());
+        }
+      }
     }
 
     // Update the channels.
