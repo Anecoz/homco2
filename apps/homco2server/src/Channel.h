@@ -36,7 +36,7 @@ private:
   bool _state;
 
   // Is channel in Run Once mode, i.e. on until the next off is scheduled.
-  bool _runOnce;
+  //bool _runOnce;
   
   std::vector<common::Interval> _activatedIntervals;
 };

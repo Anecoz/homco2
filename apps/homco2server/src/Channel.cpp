@@ -9,7 +9,7 @@ Channel::Channel(ChannelId channelId, Gpio* gpio)
   , _gpio(gpio)
   , _master(false)
   , _state(false)
-  , _runOnce(false)  
+  //, _runOnce(false)  
 {
   _state = _gpio->poll(_channelId);
 }
