@@ -3,7 +3,7 @@
 #include <cstddef>
 
 namespace homco2 {
-namespace server {
+namespace common {
 
 typedef std::size_t ChannelId;
 

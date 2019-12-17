@@ -19,13 +19,13 @@ Gpio::Gpio()
   std::cout << "Gpio initialized" << std::endl;
 }
 
-bool Gpio::poll(ChannelId channelId) const
+bool Gpio::poll(common::ChannelId channelId) const
 {
   std::cout << "Gpio was asked for state of channel " << std::to_string(channelId) << ", it is " << std::to_string(g_channels[channelId]) << std::endl;
   return g_channels[channelId];
 }
 
-void Gpio::set(ChannelId channelId, bool state) const
+void Gpio::set(common::ChannelId channelId, bool state) const
 {
   std::cout << "Gpio is setting channelId " << std::to_string(channelId) << " to " << std::to_string(state) << std::endl;
   g_channels[channelId] = state;

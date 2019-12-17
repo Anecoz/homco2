@@ -4,13 +4,14 @@
 namespace homco2 {
 namespace server {
 
-Channel::Channel(ChannelId channelId, Gpio* gpio)
+Channel::Channel(common::ChannelId channelId, Gpio* gpio)
   : _channelId(channelId)
   , _gpio(gpio)
   , _master(true)
   , _overridden(false)
   , _state(false)
-  , _runOnce(false)  
+  , _runOnce(false)
+  , _dirty(false)
 {
   _state = _gpio->poll(_channelId);
 }
@@ -30,8 +31,11 @@ std::vector<common::WeekdayInterval> Channel::intervals()
 
 void Channel::setState(bool state)
 {
-  _gpio->set(_channelId, state);
-  _state = state;
+  if (_state != state) {
+    _gpio->set(_channelId, state);
+    _state = state;
+    _dirty = true;
+  }
 }
 
 bool Channel::poll()
@@ -41,9 +45,12 @@ bool Channel::poll()
 
 void Channel::setMaster(bool state) 
 {
-  _master = state;
-  if (!_master && poll()) {
-    setState(false);
+  if (_master != state) {
+    _master = state;
+    if (!_master && poll()) {
+      setState(false);
+    }
+    _dirty = true;
   }
 }
 
@@ -62,14 +69,18 @@ void Channel::setRunOnce(bool state)
   // TODO: Implement
   if (_master) {
     _runOnce = state;
-  }
+    _dirty = true;
+  }  
 }
 
 void Channel::override(bool state)
 {
   if (_master) {
-    _overridden = state;
-    setState(state);
+    if (_overridden != state) {
+      _overridden = state;
+      setState(state);
+      _dirty = true;
+    }
   }
 }
 
@@ -87,6 +98,26 @@ void Channel::update()
       }
     }    
   }
+}
+
+common::ChannelState Channel::state()
+{
+  common::ChannelState out;
+  out._id = _channelId;
+  out._master = _master;
+  out._overridden = _overridden;
+  out._state = _state;
+  return out;
+}
+
+bool Channel::dirty()
+{
+  return _dirty;
+}
+
+void Channel::clean()
+{
+  _dirty = false;
 }
 
 }

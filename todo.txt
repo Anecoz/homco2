@@ -5,6 +5,7 @@ Server:
   - "Run once" per channel, until next off
   -D Thread-safeify callbacks, mutex on channel/gpio access?
   - GET for master, run-once, override
+  - Register callbacks for state changes (i.e. app wants to get a callback)
 
 App:
   - GUI (qml?)

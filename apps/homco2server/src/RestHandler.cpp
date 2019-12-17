@@ -1,7 +1,9 @@
 #include "RestHandler.h"
 
 #include <cpprest/asyncrt_utils.h>
+#include <cpprest/http_client.h>
 
+#include <algorithm>
 #include <iostream>
 #include <vector>
 
@@ -10,7 +12,7 @@ namespace server {
 
 RestHandler::RestHandler(
   unsigned port,
-  const std::vector<ChannelId>& channels,
+  const std::vector<common::ChannelId>& channels,
   ChannelStateCallback channelStateCb,
   ChannelMasterStateCallback channelMasterStateCb,
   ChannelOverrideStateCallback channelOverrideStateCb,
@@ -34,6 +36,7 @@ bool RestHandler::init()
   // Setup a base listener for the root uri
   _baseListener = web::http::experimental::listener::http_listener(utility::conversions::to_string_t(_uri));
   _baseListener.support(web::http::methods::GET, std::bind(&RestHandler::baseGet, this, std::placeholders::_1));
+  _baseListener.support(web::http::methods::POST, std::bind(&RestHandler::subscribePost, this, std::placeholders::_1));
 
   // Setup a listener for each channel, so we don't have to parse each request in a single "base" listener.
   for (const auto& channel : _channels) {
@@ -67,13 +70,64 @@ bool RestHandler::init()
   return true;
 }
 
+void RestHandler::notifySubscribers(common::ChannelState channelState)
+{
+  if (_subscriberUris.empty()) {
+    return;
+  }
+
+  for (auto it = _subscriberUris.begin(); it != _subscriberUris.end();) {
+    web::http::client::http_client client(utility::conversions::to_string_t(*it));
+    auto topObject = web::json::value::object();
+    topObject[utility::conversions::to_string_t("id")] = web::json::value::number(channelState._id);
+    topObject[utility::conversions::to_string_t("state")] = web::json::value::boolean(channelState._state);
+    topObject[utility::conversions::to_string_t("master")] = web::json::value::boolean(channelState._master);
+    topObject[utility::conversions::to_string_t("overridden")] = web::json::value::boolean(channelState._overridden);
+
+    try {
+      std::cout << "Notifying uri " << *it << "... ";
+      auto response = client.request(web::http::methods::POST, U("/"), topObject).get();
+      std::cout << "Done." << std::endl;
+      ++it;
+    }
+    catch (std::exception& e) {
+      std::cout << "Exception when notifying subscriber (" + *it + "): " << e.what() << std::endl;
+      // Drop the uri
+      it = _subscriberUris.erase(it);
+    }
+  }
+}
+
 void RestHandler::baseGet(web::http::http_request req)
 {
   // TODO: Return list of channels
   req.reply(200);
 }
 
-void RestHandler::handleGet(web::http::http_request req, ChannelId channel)
+void RestHandler::subscribePost(web::http::http_request req)
+{
+  auto relativeUri = utility::conversions::to_utf8string(req.relative_uri().to_string());
+
+  if (relativeUri == "/subscribe") {
+    auto address = utility::conversions::to_utf8string(req.remote_address());
+    if (address[0] == ':') {
+      // Assume it is an IPV6-addr, and needs brackets
+      address = "[" + address + "]";
+    }
+    address = std::string("http://") + address + std::string(":54321");
+    if (std::find(_subscriberUris.begin(), _subscriberUris.end(), address) == _subscriberUris.end()) {
+      _subscriberUris.emplace_back(address);
+    }    
+
+    // Also notify the poor subscriber of his own address.
+    auto json = web::json::value::object();
+    json[utility::conversions::to_string_t("addr")] = web::json::value::string(utility::conversions::to_string_t(address));
+    req.reply(201, json);
+  }
+  req.reply(404);
+}
+
+void RestHandler::handleGet(web::http::http_request req, common::ChannelId channel)
 {
   // relativeUri will be e.g. "/override" or just "/"
   auto relativeUri = utility::conversions::to_utf8string(req.relative_uri().to_string());
@@ -122,7 +176,7 @@ void RestHandler::handleGet(web::http::http_request req, ChannelId channel)
   }
 }
 
-void RestHandler::handlePost(web::http::http_request req, ChannelId channel)
+void RestHandler::handlePost(web::http::http_request req, common::ChannelId channel)
 {
   // relativeUri will be e.g. "/override" or just "/"
   auto relativeUri = utility::conversions::to_utf8string(req.relative_uri().to_string());
@@ -173,9 +227,11 @@ void RestHandler::handlePost(web::http::http_request req, ChannelId channel)
       auto val = value.as_object().at(utility::conversions::to_string_t("state")).as_bool();
       _channelOverrideCb(channel, val);
       req.reply(200);
+      return;
     }
     else {
       req.reply(500);
+      return;
     }
   }
   else if (relativeUri == "/master") {

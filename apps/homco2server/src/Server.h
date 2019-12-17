@@ -20,13 +20,13 @@ public:
   void run();
 
 private:
-  bool channelStateCallback(ChannelId id);
-  bool channelMasterStateCallback(ChannelId id);
-  bool channelOverrideStateCallback(ChannelId id);
-  bool channelOverrideCallback(ChannelId id, bool state);
-  bool channelMasterCallback(ChannelId id, bool state);
-  bool channelSetTimerCallback(ChannelId id, std::vector<common::WeekdayInterval> intervals);
-  std::vector<common::WeekdayInterval> channelTimerStateCallback(ChannelId id);
+  bool channelStateCallback(common::ChannelId id);
+  bool channelMasterStateCallback(common::ChannelId id);
+  bool channelOverrideStateCallback(common::ChannelId id);
+  bool channelOverrideCallback(common::ChannelId id, bool state);
+  bool channelMasterCallback(common::ChannelId id, bool state);
+  bool channelSetTimerCallback(common::ChannelId id, std::vector<common::WeekdayInterval> intervals);
+  std::vector<common::WeekdayInterval> channelTimerStateCallback(common::ChannelId id);
 
   RestHandler _handler;
   std::vector<Channel> _channels;

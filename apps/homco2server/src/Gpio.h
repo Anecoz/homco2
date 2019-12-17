@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ChannelId.h"
+#include "../common/ChannelId.h"
 
 namespace homco2 {
 namespace server {
@@ -11,8 +11,8 @@ public:
   Gpio();
   ~Gpio() = default;
 
-  bool poll(ChannelId channelid) const;
-  void set(ChannelId, bool state) const;
+  bool poll(common::ChannelId channelid) const;
+  void set(common::ChannelId, bool state) const;
 };
 
 }
