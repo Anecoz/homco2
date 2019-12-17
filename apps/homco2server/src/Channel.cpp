@@ -7,9 +7,10 @@ namespace server {
 Channel::Channel(ChannelId channelId, Gpio* gpio)
   : _channelId(channelId)
   , _gpio(gpio)
-  , _master(false)
+  , _master(true)
+  , _overridden(false)
   , _state(false)
-  //, _runOnce(false)  
+  , _runOnce(false)  
 {
   _state = _gpio->poll(_channelId);
 }
@@ -17,38 +18,74 @@ Channel::Channel(ChannelId channelId, Gpio* gpio)
 Channel::~Channel()
 {}
 
+void Channel::setIntervals(std::vector<common::WeekdayInterval>&& intervals)
+{
+  _intervals = std::move(intervals);
+}
+
+std::vector<common::WeekdayInterval> Channel::intervals()
+{
+  return _intervals;
+}
+
 void Channel::setState(bool state)
 {
   _gpio->set(_channelId, state);
   _state = state;
 }
 
+bool Channel::poll()
+{
+  return _gpio->poll(_channelId);
+}
+
 void Channel::setMaster(bool state) 
 {
   _master = state;
-  // TODO: THIS IS WRONG AND WON'T WORK. THINK IT THROUGH.
-  setState(_master);
+  if (!_master && poll()) {
+    setState(false);
+  }
+}
+
+bool Channel::isMasterSet()
+{
+  return _master;
+}
+
+bool Channel::isOverridden()
+{
+  return _overridden;
+}
+
+void Channel::setRunOnce(bool state) 
+{
+  // TODO: Implement
+  if (_master) {
+    _runOnce = state;
+  }
+}
+
+void Channel::override(bool state)
+{
+  if (_master) {
+    _overridden = state;
+    setState(state);
+  }
 }
 
 void Channel::update()
 {
-  // Check the time and figure out if we need to turn ourselves on or off.
-  auto now = common::Timestamp::now();
+  if (_master) {
+    if (!_overridden) {
+      bool requiredState = false;
+      for (auto& interval: _intervals) {
+        requiredState |= interval.activeNow();
+      }
 
-  bool shouldBeActivated = false;
-  for (const auto& interval: _activatedIntervals) {
-    if (interval.intersects(now)) {
-      shouldBeActivated = true;
-    }
-  }
-
-  if (shouldBeActivated && !_state) {
-    // We are off but should be on
-    setState(true);
-  }
-  else if (!shouldBeActivated && _state) {
-    // We are on but should now be off
-    setState(false);
+      if (_state != requiredState) {
+        setState(requiredState);
+      }
+    }    
   }
 }
 

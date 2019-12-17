@@ -1,8 +1,10 @@
 Server:
-  - Timer. Day-interval and time on and time off (per channel)
-  - Master on/off per channel (is channel active or not basically)
-  - Override on/off per channel (but keep timer)
+  -D Timer. Day-interval and time on and time off (per channel)
+  -D Master on/off per channel (is channel active or not basically)
+  -D Override on/off per channel (but keep timer)
   - "Run once" per channel, until next off
+  -D Thread-safeify callbacks, mutex on channel/gpio access?
+  - GET for master, run-once, override
 
 App:
   - GUI (qml?)

@@ -2,6 +2,7 @@
 
 if (WIN32)
   set(CMAKE_TOOLCHAIN_FILE "E:/dev/vcpkg/scripts/buildsystems/vcpkg.cmake" CACHE STRING "")
+  add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 endif()
 
 cmake_minimum_required(VERSION 3.7)

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ChannelId.h"
-#include "../common/Interval.h"
+#include "../common/WeekdayInterval.h"
 
 #include <vector>
 
@@ -20,7 +20,21 @@ public:
 
   void setMaster(bool state);
 
+  void setRunOnce(bool state);
+
+  void override(bool state);
+
   void update();
+
+  bool poll();
+
+  bool isMasterSet();
+
+  bool isOverridden();
+
+  void setIntervals(std::vector<common::WeekdayInterval>&& intervals);
+
+  std::vector<common::WeekdayInterval> intervals();
 
 private:
   // Turn us on or off.
@@ -29,16 +43,19 @@ private:
   ChannelId _channelId;
   Gpio* _gpio;
 
-  // Master switch that overrides any stored intervals.
+  // Master switch, i.e. enabled at all or not.
   bool _master;
+
+  // If we are overriden or not.
+  bool _overridden;
 
   // Channel state, on or off.
   bool _state;
 
   // Is channel in Run Once mode, i.e. on until the next off is scheduled.
-  //bool _runOnce;
-  
-  std::vector<common::Interval> _activatedIntervals;
+  bool _runOnce;
+
+  std::vector<common::WeekdayInterval> _intervals;
 };
 
 }

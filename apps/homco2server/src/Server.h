@@ -4,6 +4,7 @@
 #include "Channel.h"
 #include "Gpio.h"
 
+#include <mutex>
 #include <vector>
 
 namespace homco2 {
@@ -20,11 +21,17 @@ public:
 
 private:
   bool channelStateCallback(ChannelId id);
-  bool channelSetCallback(ChannelId id, bool state);
+  bool channelMasterStateCallback(ChannelId id);
+  bool channelOverrideStateCallback(ChannelId id);
+  bool channelOverrideCallback(ChannelId id, bool state);
+  bool channelMasterCallback(ChannelId id, bool state);
+  bool channelSetTimerCallback(ChannelId id, std::vector<common::WeekdayInterval> intervals);
+  std::vector<common::WeekdayInterval> channelTimerStateCallback(ChannelId id);
 
   RestHandler _handler;
   std::vector<Channel> _channels;
   Gpio _gpio;
+  std::mutex _mutex;
 };
 
 }
