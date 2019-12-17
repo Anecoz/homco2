@@ -1,12 +1,19 @@
-#include "network/NetworkManager.h"
+#include <QGuiApplication>
+#include <QQmlEngine>
+#include <QQuickView>
+
 #include <iostream>
 
-int main()
+int main(int argc, char* argv[])
 {
-  // TESTING
-  homco2::network::NetworkManager netManager;
+  QGuiApplication app(argc, argv);
 
-  int i;
-  std::cin >> i;
-  return 0;
+  QQuickView view;
+  view.connect(view.engine(), &QQmlEngine::quit, &app, &QCoreApplication::quit);
+  view.setSource(QUrl("qrc:/homco2/main.qml"));
+  if (view.status() == QQuickView::Error)
+      return -1;
+  view.setResizeMode(QQuickView::SizeRootObjectToView);
+  view.show();
+  return app.exec();
 }

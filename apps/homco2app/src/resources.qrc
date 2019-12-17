@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/homco2">
+        <file>main.qml</file>
+    </qresource>
+</RCC>
