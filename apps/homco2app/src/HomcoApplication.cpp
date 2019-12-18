@@ -68,6 +68,8 @@ int HomcoApplication::run(int argc, char* argv[])
 
   _view->connect(_view->engine(), &QQmlEngine::quit, &app, &QCoreApplication::quit);
   _view->setSource(QUrl("qrc:/homco2/main.qml"));
+  _view->setMinimumHeight(500);
+  _view->setMinimumWidth(500);
 
   if (_view->status() == QQuickView::Error) {
     return -1;

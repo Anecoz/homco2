@@ -35,6 +35,11 @@ void ChannelDataObject::setOverridden(bool val)
   // TODO, update upstream etc
 }
 
+QString ChannelDataObject::id() const 
+{
+  return QString::number(_currentState._id);
+}
+
 bool ChannelDataObject::isMaster() const
 {
   return _currentState._master;
