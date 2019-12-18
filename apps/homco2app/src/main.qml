@@ -1,4 +1,4 @@
-import QtQuick 2.0
+import QtQuick 2.12
 import QtQuick.Layouts 1.12
 import QtQuick.Controls 2.12
 
@@ -123,7 +123,8 @@ Rectangle {
         id: id_overrideSwitch
         anchors.top: id_overrideLabel.bottom
         anchors.horizontalCenter: id_overrideLabel.horizontalCenter
-        checked: model.modelData.overridden
+        checked: model.modelData.overridden && model.modelData.master
+        enabled: model.modelData.master
 
         onToggled: {
           adapter.onOverriddenSwitched(model.modelData.id, checked)
@@ -135,15 +136,15 @@ Rectangle {
           x: id_overrideSwitch.leftPadding
           y: parent.height / 2 - height / 2
           radius: 13
-          color: id_overrideSwitch.checked ? "green" : "red"
-          border.color: id_overrideSwitch.checked ? "green" : "red"
+          color: id_overrideSwitch.enabled ? (id_overrideSwitch.checked ? "green" : "red") : "#444444"
+          border.color: id_overrideSwitch.enabled ? (id_overrideSwitch.checked ? "green" : "red") : "#444444"
 
           Rectangle {
             x: id_overrideSwitch.checked ? parent.width - width : 0
             width: 26
             height: 26
             radius: 13
-            color: id_overrideSwitch.down ? "#cccccc" : "#ffffff"
+            color: id_overrideSwitch.enabled ? (id_overrideSwitch.down ? "#cccccc" : "#ffffff") : "#777777"
             border.color: id_overrideSwitch.checked ? (id_overrideSwitch.down ? "#17a81a" : "#21be2b") : "#999999"
           }
         }

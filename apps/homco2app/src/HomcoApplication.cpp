@@ -9,6 +9,8 @@
 #include <QGuiApplication>
 #include <QQuickView>
 #include <QList>
+#include <QtWidgets/QAction>
+#include <QtWidgets/QShortcut>
 
 namespace homco2 {
 namespace app {
@@ -59,6 +61,11 @@ void HomcoApplication::masterSetCallback(common::ChannelId id, bool state)
   _restClient->setMaster(id, state);
 }
 
+void HomcoApplication::reloadQml()
+{
+  _view->engine()->clearComponentCache();
+}
+
 int HomcoApplication::run(int argc, char* argv[])
 {
   QGuiApplication app(argc, argv);
@@ -78,13 +85,21 @@ int HomcoApplication::run(int argc, char* argv[])
   _restClient->init();
 
   _view->connect(_view->engine(), &QQmlEngine::quit, &app, &QCoreApplication::quit);
-  _view->setSource(QUrl("qrc:/homco2/main.qml"));
+  _view->setSource(QUrl("apps/homco2app/src/loader.qml"));
   _view->setMinimumHeight(500);
   _view->setMinimumWidth(500);
 
   if (_view->status() == QQuickView::Error) {
     return -1;
   }
+
+  _view->engine()->rootContext()->setContextProperty("app", this);
+
+  auto action = new QAction(this);
+  action->setShortcut(Qt::Key_F5);
+  connect(action, &QAction::triggered, [this](){
+    reloadQml();
+  });
 
   _view->setResizeMode(QQuickView::SizeRootObjectToView);
   _view->show();

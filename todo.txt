@@ -18,3 +18,5 @@ App:
 Bugs:
   -D Exception that isn't handled if app is started and server is not running
   - Error handling, i.e. what if setting up subscription fails? Or if setting state fails
+  - Set override. Turn off master. Turn back master. Override should be off.
+  - Use QRC when deploying, disable hot reloading.

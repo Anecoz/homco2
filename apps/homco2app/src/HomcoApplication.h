@@ -27,6 +27,9 @@ public:
 
   int run(int argc, char* argv[]);
 
+public slots:
+  void reloadQml();
+
 private:
   void setupChannelDataObjects();
   void subCallback(common::ChannelState channelState);
