@@ -15,7 +15,7 @@ class ChannelDataObject : public QObject
   Q_PROPERTY(bool master READ isMaster WRITE setMaster NOTIFY masterChanged)
   Q_PROPERTY(bool overridden READ isOverridden WRITE setOverridden NOTIFY overriddenChanged)
   Q_PROPERTY(bool state READ isState NOTIFY stateChanged)
-  Q_PROPERTY(QString id READ id NOTIFY idChanged)
+  Q_PROPERTY(int id READ id NOTIFY idChanged)
 
 public:
   ChannelDataObject();
@@ -27,13 +27,13 @@ signals:
   void masterChanged(bool);
   void overriddenChanged(bool);
   void stateChanged(bool);
-  void idChanged(QString);
+  void idChanged(int);
 
 private:
   void setMaster(bool);
   void setOverridden(bool);
 
-  QString id() const;
+  int id() const;
   bool isMaster() const;
   bool isOverridden() const;
   bool isState() const;

@@ -82,6 +82,10 @@ Rectangle {
         anchors.horizontalCenter: id_masterLabel.horizontalCenter
         checked: model.modelData.master
 
+        onToggled: {
+          adapter.onMasterSwitched(model.modelData.id, checked)
+        }
+
         indicator: Rectangle {
           implicitWidth: 48
           implicitHeight: 26
@@ -120,6 +124,10 @@ Rectangle {
         anchors.top: id_overrideLabel.bottom
         anchors.horizontalCenter: id_overrideLabel.horizontalCenter
         checked: model.modelData.overridden
+
+        onToggled: {
+          adapter.onOverriddenSwitched(model.modelData.id, checked)
+        }
 
         indicator: Rectangle {
           implicitWidth: 48

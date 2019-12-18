@@ -30,6 +30,8 @@ public:
 private:
   void setupChannelDataObjects();
   void subCallback(common::ChannelState channelState);
+  void masterSetCallback(common::ChannelId id, bool state);
+  void overrideSetCallback(common::ChannelId id, bool state);
 
   QQuickView* _view;
 

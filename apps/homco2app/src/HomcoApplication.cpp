@@ -49,14 +49,25 @@ void HomcoApplication::subCallback(common::ChannelState channelState)
   _channelDataObjects[channelState._id]->updateState(channelState);
 }
 
+void HomcoApplication::overrideSetCallback(common::ChannelId id, bool state)
+{
+  _restClient->setOverride(id, state);
+}
+
+void HomcoApplication::masterSetCallback(common::ChannelId id, bool state)
+{
+  _restClient->setMaster(id, state);
+}
+
 int HomcoApplication::run(int argc, char* argv[])
 {
   QGuiApplication app(argc, argv);
 
   _view = new QQuickView();
 
-  _adapter = std::make_unique<QmlAdapter>();
-  _adapter->init();
+  _adapter = std::make_unique<QmlAdapter>(
+    std::bind(&HomcoApplication::masterSetCallback, this, std::placeholders::_1, std::placeholders::_2),
+    std::bind(&HomcoApplication::overrideSetCallback, this, std::placeholders::_1, std::placeholders::_2));
   _view->engine()->rootContext()->setContextProperty("adapter", _adapter.get());
 
   setupChannelDataObjects();

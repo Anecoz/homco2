@@ -21,6 +21,9 @@ public:
 
   void init();
 
+  void setMaster(common::ChannelId id, bool state);
+  void setOverride(common::ChannelId id, bool state);
+
 private:
   void setupSubscriptionListener();
   void requestInitialState();

@@ -21,6 +21,34 @@ void RestClient::init()
   requestInitialState();
 }
 
+void RestClient::setMaster(common::ChannelId id, bool state)
+{
+  std::string req = std::string("/") + std::to_string(id) + std::string("/master");
+  auto json = web::json::value::object();
+  json[utility::conversions::to_string_t("state")] = web::json::value::boolean(state);
+
+  try {
+    _client.request(web::http::methods::POST, utility::conversions::to_string_t(req.c_str()), json).wait();
+  }
+  catch (std::exception& e) {
+    std::cerr << "Caught exception while setting master: " << e.what() << std::endl;
+  }
+}
+
+void RestClient::setOverride(common::ChannelId id, bool state)
+{
+  std::string req = std::string("/") + std::to_string(id) + std::string("/override");
+  auto json = web::json::value::object();
+  json[utility::conversions::to_string_t("state")] = web::json::value::boolean(state);
+
+  try {
+    _client.request(web::http::methods::POST, utility::conversions::to_string_t(req.c_str()), json).wait();
+  }
+  catch (std::exception& e) {
+    std::cerr << "Caught exception while setting override: " << e.what() << std::endl;
+  }
+}
+
 void RestClient::requestInitialState()
 {
   for (unsigned i = 0; i < 8; ++i) {

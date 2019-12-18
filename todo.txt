@@ -12,6 +12,8 @@ App:
   -D Rest client (cpprestsdk)
   - Find IP automatically somehow? If we know port?
   -D Make a client abstraction, easier and nicer to handle communication
+  - Know what state is illegal (i.e. setting override when master is off)
+  - Set actual timer
 
 Bugs:
   -D Exception that isn't handled if app is started and server is not running
