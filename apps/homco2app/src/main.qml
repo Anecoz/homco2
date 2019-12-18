@@ -7,7 +7,7 @@ Rectangle {
   width: 1280
   height: 720
   focus: true
-  color: "#272822"
+  color: "black"
 
   GridView {
     id: id_gridView
@@ -23,7 +23,7 @@ Rectangle {
         id: id_mainRect
         width: id_gridView.cellWidth - 5
         height: id_gridView.cellHeight - 5
-        color: "gray"
+        color: "#2b2d2f"
       }
 
       // Channel name
@@ -31,6 +31,7 @@ Rectangle {
         id: id_channelName
         anchors.top: id_mainRect.top
         anchors.topMargin: 5
+        color: "white"
         text: "Channel " +  model.modelData.id;
         font.pointSize: 20
         anchors.left: id_mainRect.left
@@ -66,6 +67,7 @@ Rectangle {
       Text {
         id: id_masterLabel
         text: "Master";
+        color: "white"
         anchors.top: id_separator.bottom
         anchors.topMargin: 2
         font.pointSize: 14
@@ -104,6 +106,7 @@ Rectangle {
       Text {
         id: id_overrideLabel
         text: "Override";
+        color: "white"
         anchors.top: id_masterSwitch.bottom
         anchors.topMargin: 5
         font.pointSize: 14
