@@ -20,7 +20,7 @@ public:
   void run();
 
 private:
-  bool channelStateCallback(common::ChannelId id);
+  common::ChannelState channelStateCallback(common::ChannelId id);
   bool channelMasterStateCallback(common::ChannelId id);
   bool channelOverrideStateCallback(common::ChannelId id);
   bool channelOverrideCallback(common::ChannelId id, bool state);

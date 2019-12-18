@@ -9,13 +9,24 @@ Rectangle {
   focus: true
   color: "#272822"
 
-  GridLayout {
+  GridView {
+    anchors.fill: parent
+
+    model: channelModel
+    delegate: Column {
+      Text {text: "Master"; color: model.modelData.master ? "green" : "red"}
+    }
+  }
+
+  /*GridLayout {
     anchors.fill: parent
     id: grid
     columns: 3
 
     Button {
-      text: "Override ch 0"
+        text: "Override ch 0"
+        Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+      enabled: true
       onClicked: console.log("clicked!")
     }
     Text {
@@ -28,26 +39,9 @@ Rectangle {
       text: "overridden"
       color: "red"
     }
-  }
+  }*/
 
-  Connections {
-    target: adapter
-    onChannelUpdated: {
-      // id, master, overridden
-      if (id == 0) {
-        if (master) {
-          id_masterText0.color = "green";
-        }
-        else {
-          id_masterText0.color = "red";
-        }
-        if (overridden) {
-          id_overriddenText0.color = "green";
-        }
-        else {
-          id_overriddenText0.color = "red";
-        }
-      }
-    }
-  }
+  //Connections {
+  //  target: adapter
+  //}
 }

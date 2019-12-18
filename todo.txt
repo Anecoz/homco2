@@ -5,8 +5,14 @@ Server:
   - "Run once" per channel, until next off
   -D Thread-safeify callbacks, mutex on channel/gpio access?
   - GET for master, run-once, override
-  - Register callbacks for state changes (i.e. app wants to get a callback)
+  -D Register callbacks for state changes (i.e. app wants to get a callback)
 
 App:
-  - GUI (qml?)
-  - Rest client (cpprestsdk)
+  -D GUI (qml?)
+  -D Rest client (cpprestsdk)
+  - Find IP automatically somehow? If we know port?
+  -D Make a client abstraction, easier and nicer to handle communication
+
+Bugs:
+  -D Exception that isn't handled if app is started and server is not running
+  - Error handling, i.e. what if setting up subscription fails? Or if setting state fails

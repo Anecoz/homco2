@@ -78,15 +78,11 @@ void RestHandler::notifySubscribers(common::ChannelState channelState)
 
   for (auto it = _subscriberUris.begin(); it != _subscriberUris.end();) {
     web::http::client::http_client client(utility::conversions::to_string_t(*it));
-    auto topObject = web::json::value::object();
-    topObject[utility::conversions::to_string_t("id")] = web::json::value::number(channelState._id);
-    topObject[utility::conversions::to_string_t("state")] = web::json::value::boolean(channelState._state);
-    topObject[utility::conversions::to_string_t("master")] = web::json::value::boolean(channelState._master);
-    topObject[utility::conversions::to_string_t("overridden")] = web::json::value::boolean(channelState._overridden);
+    auto json = common::channelStateToJson(channelState);
 
     try {
       std::cout << "Notifying uri " << *it << "... ";
-      auto response = client.request(web::http::methods::POST, U("/"), topObject).get();
+      auto response = client.request(web::http::methods::POST, U("/"), json).get();
       std::cout << "Done." << std::endl;
       ++it;
     }
@@ -133,7 +129,7 @@ void RestHandler::handleGet(web::http::http_request req, common::ChannelId chann
   auto relativeUri = utility::conversions::to_utf8string(req.relative_uri().to_string());
   if (relativeUri == "/") {
     auto state = _channelStateCb(channel);
-    auto responseJson = web::json::value::boolean(state);
+    auto responseJson = common::channelStateToJson(state);
     req.reply(200, responseJson);
   }
   else if (relativeUri == "/master") {

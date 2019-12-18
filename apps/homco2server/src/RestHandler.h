@@ -13,7 +13,7 @@
 API:
 /                   GET: List of channelIds available
 /subscribe          POST: Subscribe to state changes of channels (callback url in body)
-/<channel>          GET: Return boolean representing if channel is currently on or off
+/<channel>          GET: Return channel state json object
 /<channel>/timer    GET: Return json array with timer configuration (week day intervals, time on and time off)
 /<channel>          POST: Set new timer interval. Body contains day intervals, time on and time off (minute resolution)
 /<channel>/override POST: Override, set state on or off (true or false in body)
@@ -25,7 +25,7 @@ API:
 namespace homco2 {
 namespace server {
 
-typedef std::function<bool(common::ChannelId)> ChannelStateCallback;
+typedef std::function<common::ChannelState(common::ChannelId)> ChannelStateCallback;
 typedef std::function<bool(common::ChannelId)> ChannelMasterStateCallback;
 typedef std::function<bool(common::ChannelId)> ChannelOverrideStateCallback;
 typedef std::function<bool(common::ChannelId, bool)> ChannelOverrideCallback;

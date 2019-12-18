@@ -49,12 +49,12 @@ void Server::run()
   }
 }
 
-bool Server::channelStateCallback(common::ChannelId id)
+common::ChannelState Server::channelStateCallback(common::ChannelId id)
 {
-  bool answer = false;
+  common::ChannelState answer;
   {
     std::lock_guard<std::mutex> lock(_mutex);
-    answer = _channels[id].poll();
+    answer = _channels[id].state();
   }
   return answer;
 }

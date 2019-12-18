@@ -2,6 +2,8 @@
 
 #include "ChannelId.h"
 
+#include <cpprest/json.h>
+
 namespace homco2 {
 namespace common {
 
@@ -12,6 +14,10 @@ struct ChannelState
   bool _master;
   bool _overridden;
 };
+
+ChannelState channelStateFromJson(web::json::value json);
+
+web::json::value channelStateToJson(const ChannelState& channelState);
 
 }
 }
