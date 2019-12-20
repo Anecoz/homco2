@@ -2,6 +2,8 @@
 
 #include "../common/WeekdayInterval.h"
 
+#include <thread>
+
 namespace homco2 {
 namespace server {
 

@@ -82,7 +82,7 @@ void RestClient::setupSubscriptionListener()
         }).wait();
       }
       catch (const std::exception & e) {
-        std::cerr << "Exception caught while starting subscription listener: " << e.what() << std::endl;
+        std::cerr << "Exception caught while starting subscription listener " << "(" << addr << "): " << e.what() << std::endl;
       }
     }).wait();
   }

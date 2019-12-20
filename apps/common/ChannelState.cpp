@@ -17,7 +17,7 @@ ChannelState channelStateFromJson(web::json::value json)
 web::json::value channelStateToJson(const ChannelState& channelState)
 {
   auto topObject = web::json::value::object();
-  topObject[utility::conversions::to_string_t("id")] = web::json::value::number(channelState._id);
+  topObject[utility::conversions::to_string_t("id")] = web::json::value::number(static_cast<int>(channelState._id));
   topObject[utility::conversions::to_string_t("state")] = web::json::value::boolean(channelState._state);
   topObject[utility::conversions::to_string_t("master")] = web::json::value::boolean(channelState._master);
   topObject[utility::conversions::to_string_t("overridden")] = web::json::value::boolean(channelState._overridden);

@@ -9,12 +9,15 @@ project(Homco2)
 set(CMAKE_CXX_STANDARD 17)
 
 # Qt stuff
-if (NOT LINUX)
-  set(CMAKE_AUTOMOC ON)
-  set(CMAKE_AUTORCC ON)
-  set(CMAKE_AUTOUIC ON)
-
+if (WIN32)
   set(Qt5_DIR "E:/dev/qtInstall/5.12.6/msvc2017_64/lib/cmake/Qt5" CACHE STRING "")
+endif()
+
+if (APPLE)
+  set(Qt5_DIR "/usr/local/opt/qt/lib/cmake/Qt5" CACHE STRING "")
+  set(OPENSSL_ROOT_DIR "/usr/local/opt/openssl" CACHE STRING "")
+
+  find_package(Boost COMPONENTS random system thread filesystem chrono atomic date_time regex)
 endif()
 
 # For GPIO implementation specifics.

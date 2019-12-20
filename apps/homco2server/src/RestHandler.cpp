@@ -106,9 +106,9 @@ void RestHandler::subscribePost(web::http::http_request req)
 
   if (relativeUri == "/subscribe") {
     auto address = utility::conversions::to_utf8string(req.remote_address());
-    if (address[0] == ':') {
-      // Assume it is an IPV6-addr, and needs brackets
-      address = "[" + address + "]";
+    if (address == "::1") {
+      // Assume it is an IPV6-addr, and replace by localhost
+      address = "localhost";
     }
     address = std::string("http://") + address + std::string(":54321");
     if (std::find(_subscriberUris.begin(), _subscriberUris.end(), address) == _subscriberUris.end()) {
