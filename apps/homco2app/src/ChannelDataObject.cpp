@@ -22,6 +22,8 @@ void ChannelDataObject::updateState(common::ChannelState state)
     emit overriddenChanged(state._overridden);
   }
 
+  std::cout << "Updating state, size of weekday intervals is: " << std::to_string(state._intervals.size()) << std::endl;
+
   _currentState = state;
 }
 
@@ -33,6 +35,19 @@ void ChannelDataObject::setMaster(bool val)
 void ChannelDataObject::setOverridden(bool val)
 {
   // TODO, update upstream etc
+}
+
+QString ChannelDataObject::testNextOn() const
+{
+  if (_currentState._intervals.empty()) {
+    return "No timer set";
+  }
+
+  std::string out = 
+  std::to_string(_currentState._intervals[0]._clockpointOn._hour) + ":" +
+  std::to_string(_currentState._intervals[0]._clockpointOn._minute);
+
+  return QString(out.c_str());
 }
 
 int ChannelDataObject::id() const 

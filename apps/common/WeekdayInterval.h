@@ -1,5 +1,8 @@
 #pragma once
 
+#include <cpprest/json.h>
+
+#include <vector>
 #include <string>
 
 namespace homco2 {
@@ -58,6 +61,9 @@ public:
 // 0-6, 0 = monday, 6 = sunday.
 Day dayFromIndex(unsigned index);
 unsigned indexFromDay(Day day);
+
+std::vector<WeekdayInterval> weekdaysFromJson(web::json::value json);
+web::json::value weekdaysToJson(const std::vector<WeekdayInterval>& weekdays);
 
 }
 }

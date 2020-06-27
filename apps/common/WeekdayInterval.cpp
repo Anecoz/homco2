@@ -121,5 +121,68 @@ std::string WeekdayInterval::info() const
     std::string(", Off: ") + std::to_string(_clockpointOff._hour) + ":" + std::to_string(_clockpointOff._minute);
 }
 
+std::vector<WeekdayInterval> weekdaysFromJson(web::json::value json)
+{
+  std::vector<WeekdayInterval> output;
+
+  if (json.is_object()) {
+    auto topObject = json.as_object();
+
+    // On time
+    auto onTimeArray = topObject.at(utility::conversions::to_string_t("onTime")).as_array();
+    if (onTimeArray.size() != 2) {
+      return output;
+    }
+    unsigned onHour = onTimeArray[0].as_integer();
+    unsigned onMinute = onTimeArray[1].as_integer();
+
+    // Off time
+    auto offTimeArray = topObject.at(utility::conversions::to_string_t("offTime")).as_array();
+    if (offTimeArray.size() != 2) {
+      return output;
+    }
+    unsigned offHour = offTimeArray[0].as_integer();
+    unsigned offMinute = offTimeArray[1].as_integer();
+    
+    // Day array
+    auto dayArray = topObject.at(utility::conversions::to_string_t("dayInterval")).as_array();
+    output.reserve(dayArray.size());
+    for (auto& day: dayArray) {
+      common::WeekdayInterval interval(common::dayFromIndex(day.as_integer()), {onHour, onMinute}, {offHour, offMinute});
+      output.emplace_back(std::move(interval));
+    }
+  }
+
+  return output;
+}
+
+web::json::value weekdaysToJson(const std::vector<WeekdayInterval>& weekdays)
+{
+  if (weekdays.empty()) {
+    return web::json::value();
+  }
+
+  auto dayArray = web::json::value::array();
+  auto timeOnArray = web::json::value::array();
+  auto timeOffArray = web::json::value::array();
+
+  for (unsigned i = 0; i < weekdays.size(); ++i) {
+    dayArray.as_array()[i] = common::indexFromDay(weekdays.at(i)._day);
+  }
+
+  timeOnArray.as_array()[0] = weekdays[0]._clockpointOn._hour;
+  timeOnArray.as_array()[1] = weekdays[0]._clockpointOn._minute;
+  
+  timeOffArray.as_array()[0] = weekdays[0]._clockpointOff._hour;
+  timeOffArray.as_array()[1] = weekdays[0]._clockpointOff._minute;
+  
+  auto topObject = web::json::value::object();
+  topObject[utility::conversions::to_string_t("dayInterval")] = dayArray;
+  topObject[utility::conversions::to_string_t("onTime")] = timeOnArray;
+  topObject[utility::conversions::to_string_t("offTime")] = timeOffArray;
+
+  return topObject;
+}
+
 }
 }

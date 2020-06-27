@@ -5,7 +5,7 @@ Loader {
   source: "main.qml"
 
   Shortcut {
-    sequence: "F5"
+    sequence: "Q"
     context: Qt.ApplicationShortcut
     onActivated: {
       console.log("shortcut")

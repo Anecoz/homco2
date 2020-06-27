@@ -146,26 +146,8 @@ void RestHandler::handleGet(web::http::http_request req, common::ChannelId chann
     auto intervals = _channelTimerStateCb(channel);
 
     if (!intervals.empty()) {
-      auto dayArray = web::json::value::array();
-      auto timeOnArray = web::json::value::array();
-      auto timeOffArray = web::json::value::array();
-
-      for (unsigned i = 0; i < intervals.size(); ++i) {
-        dayArray.as_array()[i] = common::indexFromDay(intervals.at(i)._day);
-      }
-
-      timeOnArray.as_array()[0] = intervals[0]._clockpointOn._hour;
-      timeOnArray.as_array()[1] = intervals[0]._clockpointOn._minute;
-      
-      timeOffArray.as_array()[0] = intervals[0]._clockpointOff._hour;
-      timeOffArray.as_array()[1] = intervals[0]._clockpointOff._minute;
-      
-      auto topObject = web::json::value::object();
-      topObject[utility::conversions::to_string_t("dayInterval")] = dayArray;
-      topObject[utility::conversions::to_string_t("onTime")] = timeOnArray;
-      topObject[utility::conversions::to_string_t("offTime")] = timeOffArray;
-
-      req.reply(200, topObject);
+      auto json = common::weekdaysToJson(intervals);
+      req.reply(200, json);
       return;
     }
     req.reply(200);    
@@ -181,34 +163,7 @@ void RestHandler::handlePost(web::http::http_request req, common::ChannelId chan
     // Set a new timer entry for the channel, extract information from body.
     auto value = req.extract_json().get();
     if (value.is_object()) {
-      auto topObject = value.as_object();
-
-      // On time
-      auto onTimeArray = topObject.at(utility::conversions::to_string_t("onTime")).as_array();
-      if (onTimeArray.size() != 2) {
-        req.reply(400);
-        return;
-      }
-      unsigned onHour = onTimeArray[0].as_integer();
-      unsigned onMinute = onTimeArray[1].as_integer();
-
-      // Off time
-      auto offTimeArray = topObject.at(utility::conversions::to_string_t("offTime")).as_array();
-      if (offTimeArray.size() != 2) {
-        req.reply(400);
-        return;
-      }
-      unsigned offHour = offTimeArray[0].as_integer();
-      unsigned offMinute = offTimeArray[1].as_integer();
-      
-      // Day array
-      std::vector<common::WeekdayInterval> intervals;
-      auto dayArray = topObject.at(utility::conversions::to_string_t("dayInterval")).as_array();
-      intervals.reserve(dayArray.size());
-      for (auto& day: dayArray) {
-        common::WeekdayInterval interval(common::dayFromIndex(day.as_integer()), {onHour, onMinute}, {offHour, offMinute});
-        intervals.emplace_back(std::move(interval));
-      }
+      auto intervals = common::weekdaysFromJson(value);
 
       _channelSetTimerCb(channel, intervals);
 

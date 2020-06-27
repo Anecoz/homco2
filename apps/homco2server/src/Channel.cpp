@@ -50,6 +50,9 @@ void Channel::setMaster(bool state)
     if (!_master && poll()) {
       setState(false);
     }
+    if (!_master && _overridden) {
+      _overridden = false;
+    }
     _dirty = true;
   }
 }

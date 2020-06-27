@@ -149,6 +149,77 @@ Rectangle {
           }
         }
       }
+
+      // Testing label of next on time
+      Text {
+        id: id_nextLabel
+        text: model.modelData.testNextOn
+        color: "white"
+        font.pointSize: 14
+
+        anchors.top: id_overrideSwitch.bottom
+        anchors.horizontalCenter: id_overrideSwitch.horizontalCenter
+        anchors.topMargin: 5
+      }
+
+      // Testing, day
+      ComboBox {
+        id: id_testDayCombobox
+
+        anchors.top: id_nextLabel.bottom
+        anchors.horizontalCenter: id_nextLabel.horizontalCenter
+        anchors.topMargin: 5
+
+        onActivated: {
+          console.log("Current value: " + currentText)
+        }
+
+        model: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+      }
+
+      // Testing, hour
+      ComboBox {
+        id: id_testHourCombobox
+
+        anchors.top: id_testDayCombobox.bottom
+        anchors.horizontalCenter: id_nextLabel.horizontalCenter
+        anchors.topMargin: 5
+
+        onActivated: {
+          console.log("Current value: " + currentText)
+        }
+
+        model: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]
+      }
+
+      // Testing, minute
+      ComboBox {
+        id: id_testMinuteCombobox
+
+        anchors.top: id_testHourCombobox.bottom
+        anchors.horizontalCenter: id_nextLabel.horizontalCenter
+        anchors.topMargin: 5
+
+        onActivated: {
+          console.log("Current value: " + currentText)
+        }
+
+        model: [0, 15, 30, 45]
+      }
+
+      // Testing, accept button
+      Button {
+        id: id_testAcceptButton
+        text: "Accept"
+
+        onPressed: {
+          adapter.onTimerAccept(model.modelData.id, id_testDayCombobox.currentText, id_testHourCombobox.currentText, id_testMinuteCombobox.currentText)
+        }
+
+        anchors.top: id_testMinuteCombobox.bottom
+        anchors.horizontalCenter: id_nextLabel.horizontalCenter
+        anchors.topMargin: 5
+      }
     }
   }
 }
