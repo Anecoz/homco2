@@ -47,6 +47,7 @@ void HomcoApplication::setupChannelDataObjects()
 void HomcoApplication::subCallback(common::ChannelState channelState)
 {
   // Update model, will trigger and update in QML aswell
+  std::cout << "sub callback" << std::endl;
   std::lock_guard<std::mutex> lock(_channelMutex);
   _channelDataObjects[channelState._id]->updateState(channelState);
 }

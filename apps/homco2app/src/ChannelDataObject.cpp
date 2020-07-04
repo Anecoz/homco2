@@ -12,19 +12,25 @@ ChannelDataObject::~ChannelDataObject()
 
 void ChannelDataObject::updateState(common::ChannelState state)
 {
-  if (state._state != _currentState._state) {
+  // First set the new state, so that the "changed" signals will read the correct new state.
+  // But also save the old state to compare.
+  common::ChannelState oldState = _currentState;
+  _currentState = state;
+
+  if (_currentState._state != oldState._state) {
+    std::cout << "State changed" << std::endl;
     emit stateChanged(state._state);
   }
-  if (state._master != _currentState._master) {
+  if (_currentState._master != oldState._master) {
+    std::cout << "Master changed" << std::endl;
     emit masterChanged(state._master);
   }
-  if (state._overridden != _currentState._overridden) {
+  if (_currentState._overridden != oldState._overridden) {
+    std::cout << "Overridden changed" << std::endl;
     emit overriddenChanged(state._overridden);
   }
 
-  std::cout << "Updating state, size of weekday intervals is: " << std::to_string(state._intervals.size()) << std::endl;
-
-  _currentState = state;
+  std::cout << "Updating state: \n" << _currentState.debugStr() << std::endl;
 }
 
 void ChannelDataObject::setMaster(bool val)
@@ -40,12 +46,14 @@ void ChannelDataObject::setOverridden(bool val)
 QString ChannelDataObject::testNextOn() const
 {
   if (_currentState._intervals.empty()) {
-    return "No timer set";
+    return QString("No timer set");
   }
 
   std::string out = 
-  std::to_string(_currentState._intervals[0]._clockpointOn._hour) + ":" +
-  std::to_string(_currentState._intervals[0]._clockpointOn._minute);
+    std::to_string(_currentState._intervals[0]._clockpointOn._hour) + ":" +
+    std::to_string(_currentState._intervals[0]._clockpointOn._minute);
+
+  std::cout << "size of intervals: " << std::to_string(_currentState._intervals.size()) << std::endl;
 
   return QString(out.c_str());
 }
