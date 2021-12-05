@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../common/ChannelState.h"
+#include "../common/IChannelAdapter.h"
 
 #include <cpprest/http_client.h>
 #include <cpprest/http_listener.h>
@@ -11,12 +12,10 @@
 namespace homco2 {
 namespace app {
 
-typedef std::function<void(common::ChannelState)> ChannelStateCallback;
-
 class RestClient
 {
 public:
-  RestClient(ChannelStateCallback cb);
+  RestClient(common::IChannelAdapter* channelAdapter);
   ~RestClient();
 
   void init();
@@ -34,7 +33,7 @@ private:
   web::http::client::http_client _client;
   web::http::experimental::listener::http_listener _subscriptionListener;
 
-  ChannelStateCallback _stateCb;
+  common::IChannelAdapter* _channelAdapter;
 };
 
 }

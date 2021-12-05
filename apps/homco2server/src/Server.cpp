@@ -11,13 +11,7 @@ Server::Server()
   : _handler(
       12345,
       {0, 1, 2, 3, 4, 5, 6, 7},
-      std::bind(&Server::channelStateCallback, this, std::placeholders::_1),
-      std::bind(&Server::channelMasterStateCallback, this, std::placeholders::_1),
-      std::bind(&Server::channelOverrideStateCallback, this, std::placeholders::_1),
-      std::bind(&Server::channelOverrideCallback, this, std::placeholders::_1, std::placeholders::_2),
-      std::bind(&Server::channelMasterCallback, this, std::placeholders::_1, std::placeholders::_2),
-      std::bind(&Server::channelSetTimerCallback, this, std::placeholders::_1, std::placeholders::_2),
-      std::bind(&Server::channelTimerStateCallback, this, std::placeholders::_1))
+      this)
   , _gpio()
 {
   for (unsigned i = 0; i < 8; ++i) {
@@ -51,7 +45,7 @@ void Server::run()
   }
 }
 
-common::ChannelState Server::channelStateCallback(common::ChannelId id)
+common::ChannelState Server::getState(common::ChannelId id)
 {
   common::ChannelState answer;
   {
@@ -61,7 +55,7 @@ common::ChannelState Server::channelStateCallback(common::ChannelId id)
   return answer;
 }
 
-bool Server::channelMasterStateCallback(common::ChannelId id)
+bool Server::getMaster(common::ChannelId id)
 {
   bool answer = false;
   {
@@ -71,7 +65,7 @@ bool Server::channelMasterStateCallback(common::ChannelId id)
   return answer;
 }
 
-bool Server::channelOverrideStateCallback(common::ChannelId id)
+bool Server::getOverride(common::ChannelId id)
 {
   bool answer = false;
   {
@@ -81,7 +75,7 @@ bool Server::channelOverrideStateCallback(common::ChannelId id)
   return answer;
 }
 
-bool Server::channelOverrideCallback(common::ChannelId id, bool state)
+bool Server::setOverride(common::ChannelId id, bool state)
 {
   {
     std::lock_guard<std::mutex> lock(_mutex);
@@ -90,7 +84,7 @@ bool Server::channelOverrideCallback(common::ChannelId id, bool state)
   return true;
 }
 
-bool Server::channelMasterCallback(common::ChannelId id, bool state)
+bool Server::setMaster(common::ChannelId id, bool state)
 {
   {
     std::lock_guard<std::mutex> lock(_mutex);
@@ -99,7 +93,7 @@ bool Server::channelMasterCallback(common::ChannelId id, bool state)
   return true;
 }
 
-bool Server::channelSetTimerCallback(common::ChannelId id, std::vector<common::WeekdayInterval> intervals)
+bool Server::setIntervals(common::ChannelId id, std::vector<common::WeekdayInterval> intervals)
 {
   for (auto& interval: intervals) {
     auto info = interval.info();
@@ -114,7 +108,7 @@ bool Server::channelSetTimerCallback(common::ChannelId id, std::vector<common::W
   return true;
 }
 
-std::vector<common::WeekdayInterval> Server::channelTimerStateCallback(common::ChannelId id)
+std::vector<common::WeekdayInterval> Server::getIntervals(common::ChannelId id)
 {
   std::vector<common::WeekdayInterval> answer;
   {

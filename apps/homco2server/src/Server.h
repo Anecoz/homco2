@@ -4,13 +4,15 @@
 #include "Channel.h"
 #include "Gpio.h"
 
+#include "../../common/IChannelAdapter.h"
+
 #include <mutex>
 #include <vector>
 
 namespace homco2 {
 namespace server {
 
-class Server
+class Server : public common::IChannelAdapter
 {
 public:
   Server();
@@ -19,15 +21,17 @@ public:
   bool init();
   void run();
 
-private:
-  common::ChannelState channelStateCallback(common::ChannelId id);
-  bool channelMasterStateCallback(common::ChannelId id);
-  bool channelOverrideStateCallback(common::ChannelId id);
-  bool channelOverrideCallback(common::ChannelId id, bool state);
-  bool channelMasterCallback(common::ChannelId id, bool state);
-  bool channelSetTimerCallback(common::ChannelId id, std::vector<common::WeekdayInterval> intervals);
-  std::vector<common::WeekdayInterval> channelTimerStateCallback(common::ChannelId id);
+  common::ChannelState getState(common::ChannelId id) override;
+  bool getMaster(common::ChannelId id) override;
+  bool setMaster(common::ChannelId id, bool val) override;
 
+  bool getOverride(common::ChannelId id) override;
+  bool setOverride(common::ChannelId id, bool val) override;
+
+  std::vector<common::WeekdayInterval> getIntervals(common::ChannelId id) override;
+  bool setIntervals(common::ChannelId id, std::vector<common::WeekdayInterval> intervals) override;
+
+private:
   RestHandler _handler;
   std::vector<Channel> _channels;
   Gpio _gpio;

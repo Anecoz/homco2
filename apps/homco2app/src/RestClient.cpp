@@ -3,10 +3,10 @@
 namespace homco2 {
 namespace app {
 
-RestClient::RestClient(ChannelStateCallback cb)
+RestClient::RestClient(common::IChannelAdapter* channelAdapter)
   : _baseUri("http://localhost:12345/api/")
   , _client(utility::conversions::to_string_t(_baseUri))
-  , _stateCb(cb)
+  , _channelAdapter(channelAdapter)
 {
 }
 
@@ -56,7 +56,7 @@ void RestClient::requestInitialState()
     try {
       _client.request(web::http::methods::GET, utility::conversions::to_string_t(req.c_str())).then([this](const web::http::http_response& response) {
         common::ChannelState channelState = common::channelStateFromJson(response.extract_json().get());
-        _stateCb(channelState);
+        _channelAdapter->setState(channelState);
       }).wait();
     }
     catch (std::exception& e) {
@@ -95,7 +95,7 @@ void RestClient::subCallback(web::http::http_request req)
 {
   // Parse channel state json
   common::ChannelState channelState = common::channelStateFromJson(req.extract_json().get());
-  _stateCb(channelState);
+  _channelAdapter->setState(channelState);
   req.reply(200);
 }
 

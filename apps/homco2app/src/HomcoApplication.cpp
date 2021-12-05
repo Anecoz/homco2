@@ -44,22 +44,25 @@ void HomcoApplication::setupChannelDataObjects()
   _view->rootContext()->setContextProperty("channelModel", QVariant::fromValue(qlist));
 }
 
-void HomcoApplication::subCallback(common::ChannelState channelState)
+bool HomcoApplication::setState(common::ChannelState channelState)
 {
   // Update model, will trigger and update in QML aswell
   std::cout << "sub callback" << std::endl;
   std::lock_guard<std::mutex> lock(_channelMutex);
   _channelDataObjects[channelState._id]->updateState(channelState);
+  return true;
 }
 
-void HomcoApplication::overrideSetCallback(common::ChannelId id, bool state)
+bool HomcoApplication::setOverride(common::ChannelId id, bool state)
 {
   _restClient->setOverride(id, state);
+  return true;
 }
 
-void HomcoApplication::masterSetCallback(common::ChannelId id, bool state)
+bool HomcoApplication::setMaster(common::ChannelId id, bool state)
 {
   _restClient->setMaster(id, state);
+  return true;
 }
 
 void HomcoApplication::reloadQml()
@@ -73,16 +76,14 @@ int HomcoApplication::run(int argc, char* argv[])
 
   _view = new QQuickView();
 
-  _adapter = std::make_unique<QmlAdapter>(
-    std::bind(&HomcoApplication::masterSetCallback, this, std::placeholders::_1, std::placeholders::_2),
-    std::bind(&HomcoApplication::overrideSetCallback, this, std::placeholders::_1, std::placeholders::_2));
+  _adapter = std::make_unique<QmlAdapter>(this);
   _view->engine()->rootContext()->setContextProperty("adapter", _adapter.get());
 
   setupChannelDataObjects();
 
   // TODO: Sit and wait until we can properly initialize the rest client.
   //       Probably want to load GUI anyways though.
-  _restClient = std::make_unique<RestClient>(std::bind(&HomcoApplication::subCallback, this, std::placeholders::_1));
+  _restClient = std::make_unique<RestClient>(this);
   _restClient->init();
 
   _view->connect(_view->engine(), &QQmlEngine::quit, &app, &QCoreApplication::quit);

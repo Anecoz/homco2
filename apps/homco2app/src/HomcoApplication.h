@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../common/ChannelState.h"
+#include "../common/IChannelAdapter.h"
 
 #include <QObject>
 #include <QQuickView>
@@ -17,7 +18,7 @@ class QmlAdapter;
 class ChannelDataObject;
 class RestClient;
 
-class HomcoApplication : public QObject
+class HomcoApplication : public QObject, public common::IChannelAdapter
 {
   Q_OBJECT
 
@@ -27,14 +28,15 @@ public:
 
   int run(int argc, char* argv[]);
 
+  bool setState(common::ChannelState state) override;
+  bool setMaster(common::ChannelId id, bool val) override;
+  bool setOverride(common::ChannelId id, bool val) override;
+
 public slots:
   void reloadQml();
 
 private:
   void setupChannelDataObjects();
-  void subCallback(common::ChannelState channelState);
-  void masterSetCallback(common::ChannelId id, bool state);
-  void overrideSetCallback(common::ChannelId id, bool state);
 
   QQuickView* _view;
 

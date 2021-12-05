@@ -13,22 +13,10 @@ namespace server {
 RestHandler::RestHandler(
   unsigned port,
   const std::vector<common::ChannelId>& channels,
-  ChannelStateCallback channelStateCb,
-  ChannelMasterStateCallback channelMasterStateCb,
-  ChannelOverrideStateCallback channelOverrideStateCb,
-  ChannelOverrideCallback channelOverrideCb,
-  ChannelMasterCallback channelMasterCb,
-  ChannelSetTimerCallback channelSetTimerCb,
-  ChannelTimerStateCallback channelTimerStateCb)
+  common::IChannelAdapter* channelAdapter)
   : _channels(channels)
   , _uri("http://localhost:" + std::to_string(port) + "/api")
-  , _channelStateCb(channelStateCb)
-  , _channelMasterStateCb(channelMasterStateCb)
-  , _channelOverrideStateCb(channelOverrideStateCb)
-  , _channelOverrideCb(channelOverrideCb)
-  , _channelMasterCb(channelMasterCb)
-  , _channelSetTimerCb(channelSetTimerCb)
-  , _channelTimerStateCb(channelTimerStateCb)
+  , _channelAdapter(channelAdapter)
 {}
 
 bool RestHandler::init()
@@ -128,22 +116,22 @@ void RestHandler::handleGet(web::http::http_request req, common::ChannelId chann
   // relativeUri will be e.g. "/override" or just "/"
   auto relativeUri = utility::conversions::to_utf8string(req.relative_uri().to_string());
   if (relativeUri == "/") {
-    auto state = _channelStateCb(channel);
+    auto state = _channelAdapter->getState(channel);
     auto responseJson = common::channelStateToJson(state);
     req.reply(200, responseJson);
   }
   else if (relativeUri == "/master") {
-    auto state = _channelMasterStateCb(channel);
+    auto state = _channelAdapter->getMaster(channel);
     auto responseJson = web::json::value::boolean(state);
     req.reply(200, responseJson);
   }
   else if (relativeUri == "/override") {
-    auto state = _channelOverrideStateCb(channel);
+    auto state = _channelAdapter->getOverride(channel);
     auto responseJson = web::json::value::boolean(state);
     req.reply(200, responseJson);
   }
   else if (relativeUri == "/timer") {
-    auto intervals = _channelTimerStateCb(channel);
+    auto intervals = _channelAdapter->getIntervals(channel);
 
     if (!intervals.empty()) {
       auto json = common::weekdaysToJson(intervals);
@@ -165,7 +153,7 @@ void RestHandler::handlePost(web::http::http_request req, common::ChannelId chan
     if (value.is_object()) {
       auto intervals = common::weekdaysFromJson(value);
 
-      _channelSetTimerCb(channel, intervals);
+      _channelAdapter->setIntervals(channel, intervals);
 
       req.reply(201);
       return;
@@ -176,7 +164,7 @@ void RestHandler::handlePost(web::http::http_request req, common::ChannelId chan
     auto value = req.extract_json().get();
     if (value.is_object()) {
       auto val = value.as_object().at(utility::conversions::to_string_t("state")).as_bool();
-      _channelOverrideCb(channel, val);
+      _channelAdapter->setOverride(channel, val);
       req.reply(200);
       return;
     }
@@ -189,7 +177,7 @@ void RestHandler::handlePost(web::http::http_request req, common::ChannelId chan
     auto value = req.extract_json().get();
     if (value.is_object()) {
       auto val = value.as_object().at(utility::conversions::to_string_t("state")).as_bool();
-      _channelMasterCb(channel, val);
+      _channelAdapter->setMaster(channel, val);
       req.reply(200);
     }
     else {

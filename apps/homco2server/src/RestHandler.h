@@ -3,6 +3,7 @@
 #include "../common/ChannelId.h"
 #include "../common/ChannelState.h"
 #include "../common/WeekdayInterval.h"
+#include "../common/IChannelAdapter.h"
 
 #include <cpprest/http_listener.h>
 
@@ -25,27 +26,13 @@ API:
 namespace homco2 {
 namespace server {
 
-typedef std::function<common::ChannelState(common::ChannelId)> ChannelStateCallback;
-typedef std::function<bool(common::ChannelId)> ChannelMasterStateCallback;
-typedef std::function<bool(common::ChannelId)> ChannelOverrideStateCallback;
-typedef std::function<bool(common::ChannelId, bool)> ChannelOverrideCallback;
-typedef std::function<bool(common::ChannelId, bool)> ChannelMasterCallback;
-typedef std::function<bool(common::ChannelId, std::vector<common::WeekdayInterval>)> ChannelSetTimerCallback;
-typedef std::function<std::vector<common::WeekdayInterval>(common::ChannelId)> ChannelTimerStateCallback;
-
 class RestHandler
 {
 public:
   RestHandler(
     unsigned port,
     const std::vector<common::ChannelId>& channels,
-    ChannelStateCallback,
-    ChannelMasterStateCallback,
-    ChannelOverrideStateCallback,
-    ChannelOverrideCallback,
-    ChannelMasterCallback,
-    ChannelSetTimerCallback,
-    ChannelTimerStateCallback);
+    common::IChannelAdapter* channelAdapter);
   ~RestHandler() = default;
 
   bool init();
@@ -72,13 +59,7 @@ private:
 
   std::vector<std::string> _subscriberUris;
 
-  ChannelStateCallback _channelStateCb;
-  ChannelMasterStateCallback _channelMasterStateCb;
-  ChannelOverrideStateCallback _channelOverrideStateCb;
-  ChannelOverrideCallback _channelOverrideCb;
-  ChannelMasterCallback _channelMasterCb;
-  ChannelSetTimerCallback _channelSetTimerCb;
-  ChannelTimerStateCallback _channelTimerStateCb;
+  common::IChannelAdapter* _channelAdapter;
 };
 
 }

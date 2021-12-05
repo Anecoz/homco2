@@ -13,6 +13,13 @@ namespace common {
 
 struct ChannelState
 {
+  ChannelState()
+    : _id(100000)
+    , _state(false)
+    , _master(false)
+    , _overridden(false)
+  {}
+
   ChannelId _id;
   bool _state;
   bool _master;
